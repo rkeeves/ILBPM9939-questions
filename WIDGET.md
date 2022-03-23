@@ -42,22 +42,16 @@ e.getVisible(); // I cannot implicitly wait, because I don't know the condition 
 So my assumption, which I cannot prove, is that you cannot unify these two kinds of query behaviors
 and you must provide access to both for the API user.
 
-## 2. Classic or Visitor?
+## 2. Classic or Visitor or Command?
 
-> Which pattern is more viable Classic or Visitor?
-
-*(Personally I'm leaning towards Classic OOP because it is the simplest approach,
-and newcomers can quickly wrap their head around it.)*
+> Which pattern is more viable Classic or Visitor or Command?
 
 The widgets can be modelled in a lot of ways.
 
 Some possible approaches:
 - [Classic OOP](src/test/java/io/github/rkeeves/widget/pattern/classic/WidgetClassicPatternTest.java)
 - [Visitor](src/test/java/io/github/rkeeves/widget/pattern/visitor/WidgetVisitorPatternTest.java)
-
-I didn't bother with Command due to the fact that I wasn't able to come up with a solution.
-*(I mean a solution, where the pattern is not simply a layer of pointless indirection comparedd to the classic.
-But I'm interested in a solution.)*
+- [Command](src/test/java/io/github/rkeeves/widget/pattern/command/WidgetCommandPatternTest.java)
 
 ### 2.1. Classic
 
@@ -84,6 +78,23 @@ Visitables (the input, select etc.):
 
 It has some perks, but it's much more complicated.
 In my opinion this is overengineering for no reason.
+
+### 2.3. Command
+
+`Command` has the advantage of getting rid of state.
+*(Even though in the example I still hold on to a `WebElement` reference in the widget classes for simplicity's sake.)*
+This can come in handy if the user wants to do something entirely whacky thing,
+like instantiating 2 different drivers and doing a test which involves both.
+(Imagine a scenario, where two agents/users of different roles must interact with each other,
+and none of them can be mocked away in tests.)
+
+Also, with `Command`, it can be valuable to be able to decouple the widget's behavior from its actual implementation.
+For example: different JSF based ui tag libraries provide special tags.
+Like the default h:selectOneMenu renders a simple select, but p:selectOneMenu renders an engineering deficit.
+If we interact with a `SelectOneMenu` interface in the tests, and we make the page object responsible for deciding on
+the actual implementation, we can make the tests at least a bit more durable even if the devs keep changing the xhtml,
+due to some reason.
+
 
 ## 3. Interface defaults for common behavior
 
